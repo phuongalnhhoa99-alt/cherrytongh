@@ -4,11 +4,11 @@ local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
 local CONFIG = {
-    ESPPlayers = true,
-    ESPNPCs = true,
+    PlayerESP = true,
+    NPCESP = true,
 }
 
-local HIGHLIGHT_NAME = "HungGHubHighlight"
+local HIGHLIGHT_NAME = "CherryHubHighlight"
 
 local function createHighlight(model, color)
     if not model or not model:IsA("Model") then
@@ -33,13 +33,14 @@ local function createHighlight(model, color)
     highlight.Parent = model
 end
 
+-- PLAYER ESP
 local function setupPlayer(player)
     if player == LocalPlayer then
         return
     end
 
     local function onCharacter(character)
-        if CONFIG.ESPPlayers then
+        if CONFIG.PlayerESP then
             createHighlight(
                 character,
                 Color3.fromRGB(255, 70, 70)
@@ -60,8 +61,9 @@ end
 
 Players.PlayerAdded:Connect(setupPlayer)
 
+-- NPC ESP
 local function checkNPC(model)
-    if not CONFIG.ESPNPCs then
+    if not CONFIG.NPCESP then
         return
     end
 
@@ -83,14 +85,14 @@ local function checkNPC(model)
     )
 end
 
--- Scan NPCs already in the game
+-- Scan existing NPCs
 for _, obj in ipairs(Workspace:GetDescendants()) do
     if obj:IsA("Model") then
         checkNPC(obj)
     end
 end
 
--- Detect NPCs added later
+-- Detect new NPCs
 Workspace.DescendantAdded:Connect(function(obj)
     if obj:IsA("Model") then
         task.defer(checkNPC, obj)
@@ -99,7 +101,7 @@ Workspace.DescendantAdded:Connect(function(obj)
     end
 end)
 
-print("HungGHub loaded!")
+print("CherryHub loaded!")
 print("Player ESP: ON")
 print("NPC ESP: ON")
-print("Fly: Removed")
+print("Fly: Disabled")
