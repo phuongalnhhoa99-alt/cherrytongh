@@ -33,7 +33,7 @@ local function createHighlight(model, color)
     highlight.Parent = model
 end
 
--- PLAYER ESP
+-- Player ESP
 local function setupPlayer(player)
     if player == LocalPlayer then
         return
