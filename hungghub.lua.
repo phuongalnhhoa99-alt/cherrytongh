@@ -1,0 +1,105 @@
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local LocalPlayer = Players.LocalPlayer
+
+local CONFIG = {
+    ESPPlayers = true,
+    ESPNPCs = true,
+}
+
+local HIGHLIGHT_NAME = "HungGHubHighlight"
+
+local function createHighlight(model, color)
+    if not model or not model:IsA("Model") then
+        return
+    end
+
+    local highlight = model:FindFirstChild(HIGHLIGHT_NAME)
+
+    if highlight and highlight:IsA("Highlight") then
+        highlight.FillColor = color
+        return
+    end
+
+    highlight = Instance.new("Highlight")
+    highlight.Name = HIGHLIGHT_NAME
+    highlight.Adornee = model
+    highlight.FillColor = color
+    highlight.OutlineColor = Color3.new(1, 1, 1)
+    highlight.FillTransparency = 0.5
+    highlight.OutlineTransparency = 0
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.Parent = model
+end
+
+local function setupPlayer(player)
+    if player == LocalPlayer then
+        return
+    end
+
+    local function onCharacter(character)
+        if CONFIG.ESPPlayers then
+            createHighlight(
+                character,
+                Color3.fromRGB(255, 70, 70)
+            )
+        end
+    end
+
+    player.CharacterAdded:Connect(onCharacter)
+
+    if player.Character then
+        onCharacter(player.Character)
+    end
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+    setupPlayer(player)
+end
+
+Players.PlayerAdded:Connect(setupPlayer)
+
+local function checkNPC(model)
+    if not CONFIG.ESPNPCs then
+        return
+    end
+
+    if not model:IsA("Model") then
+        return
+    end
+
+    if not model:FindFirstChildOfClass("Humanoid") then
+        return
+    end
+
+    if Players:GetPlayerFromCharacter(model) then
+        return
+    end
+
+    createHighlight(
+        model,
+        Color3.fromRGB(70, 255, 100)
+    )
+end
+
+-- Scan NPCs already in the game
+for _, obj in ipairs(Workspace:GetDescendants()) do
+    if obj:IsA("Model") then
+        checkNPC(obj)
+    end
+end
+
+-- Detect NPCs added later
+Workspace.DescendantAdded:Connect(function(obj)
+    if obj:IsA("Model") then
+        task.defer(checkNPC, obj)
+    elseif obj:IsA("Humanoid") and obj.Parent then
+        task.defer(checkNPC, obj.Parent)
+    end
+end)
+
+print("HungGHub loaded!")
+print("Player ESP: ON")
+print("NPC ESP: ON")
+print("Fly: Removed")
