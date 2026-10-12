@@ -41,6 +41,15 @@ local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 8)
 btnCorner.Parent = button
 
+
+button.Text = "Invisible: OFF"
+
+local invisible = false
+
 button.Activated:Connect(function()
-    button.Text = "DarknessHub is ready!"
+    invisible = not invisible
+
+    button.Text = invisible
+        and "Invisible: ON"
+        or "Invisible: OFF"
 end)
